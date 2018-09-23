@@ -34,7 +34,13 @@
             android:label="@string/title_activity_signup"
             android:theme="@style/AppTheme" />
         <activity android:name=".StudentDetails" />
-
+        <activity android:name=".StudentSearch" />
+        <activity
+            android:name=".StudentInfo"
+            android:label="@string/title_activity_student_info"
+            android:screenOrientation="fullSensor"
+            android:theme="@style/AppTheme" />
+        <activity android:name=".SignupActivity2"></activity>
     </application>
 
 </manifest>

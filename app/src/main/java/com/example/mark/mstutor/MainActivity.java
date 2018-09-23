@@ -32,12 +32,17 @@ public class MainActivity extends AppCompatActivity
 
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private ViewPager mViewPager;
-    FirebaseFirestore db;
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        db = FirebaseFirestore.getInstance();
+        FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
+                .setTimestampsInSnapshotsEnabled(true)
+                .setPersistenceEnabled(false)
+                .build();
+        db.setFirestoreSettings(settings);
+
         setContentView(R.layout.activity_main);
         navLayoutInit();
         tabsInit();
@@ -66,13 +71,11 @@ public class MainActivity extends AppCompatActivity
 
     public void navLayoutInit(){
 
-        setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
@@ -80,7 +83,6 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
         ImageView header = navigationView.getHeaderView(0).findViewById(R.id.header);
         Picasso.get().load(R.drawable.pisa).into(header);
 
@@ -88,15 +90,13 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
         }
     }
-
-
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
@@ -105,21 +105,12 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_camera) {
-
-
-            Intent intent = new Intent(MainActivity.this, SignupActivity.class);
+            Intent intent = new Intent(MainActivity.this, StudentDetails.class);
             startActivity(intent);
 
         } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
+            Intent intent = new Intent(MainActivity.this, StudentSearch.class);
+            startActivity(intent);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -139,15 +130,11 @@ public class MainActivity extends AppCompatActivity
 
                 switch (position){
 
-                    case 0: RecordSheet f1 = new RecordSheet();
+                    case 0: PendingRecordSheets f1 = new PendingRecordSheets();
                         return f1;
 
                     case 1: Schedule f2 = new Schedule();
                         return f2;
-
-
-
-
                 }
 
 

@@ -15,6 +15,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -24,15 +25,16 @@ public class SignupAdapter extends RecyclerView.Adapter<SignupAdapter.ViewHolder
 
 
     Context mContext;
-    ArrayList<HashMap<String,Object>> mDataset = new ArrayList<>();
-    ArrayList<HashMap<String,Object>> details;
-    public SignupAdapter(Context context, ArrayList<HashMap<String,Object>> dataset) {
+    ArrayList<HashMap<String, String>> mDataset;
+    ArrayList<HashMap<String, String>> details;
+
+    public SignupAdapter(Context context, ArrayList<HashMap<String, String>> dataset) {
         mContext = context;
         mDataset = dataset;
-        details =  new ArrayList<>();
+        details = new ArrayList<>();
     }
 
-    public void addDay( HashMap<String,Object> dataset) {
+    public void addDay(HashMap<String, String> dataset) {
         mDataset.add(dataset);
         notifyDataSetChanged();
     }
@@ -49,60 +51,14 @@ public class SignupAdapter extends RecyclerView.Adapter<SignupAdapter.ViewHolder
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
 
-        ArrayAdapter<CharSequence> dayAdapter = ArrayAdapter.createFromResource(mContext,
-                R.array.week_array, android.R.layout.simple_spinner_item);
+        String day = mDataset.get(position).get("day");
+        String hours = mDataset.get(position).get("hours");
+        String time = mDataset.get(position).get("time");
 
-        dayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        holder.dayInformation
+                .setText("Day: " + day + "\n" + "Time: " + time + "\n" + "Hours: " + hours);
 
-        ArrayAdapter<CharSequence> hourAdapter = ArrayAdapter.createFromResource(mContext,
-                R.array.hour_array,android.R.layout.simple_spinner_item);
-
-        hourAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-
-        holder.day.setAdapter(dayAdapter);
-        holder.hours.setAdapter(hourAdapter);
-
-        holder.day.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                HashMap<String,Object> map = new HashMap<>();
-                map.put("day",parent.getItemAtPosition(position));
-                details.add(map);
-                Log.d("ADDING", "HERE I AM ADD DAY");
-
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
-
-        holder.hours.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                HashMap<String,Object> map = new HashMap<>();
-                map.put("hours",parent.getItemAtPosition(position));
-                details.add(map);
-                Log.d("ADDING", "HERE I AM ADD DAY");
-
-
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
-        HashMap<String,Object> map = new HashMap<>();
-        map.put("time",holder.time.getText().toString());
-
-        holder.cancel.setOnClickListener(new View.OnClickListener() {
+        holder.dayRemove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mDataset.remove(position);
@@ -117,27 +73,18 @@ public class SignupAdapter extends RecyclerView.Adapter<SignupAdapter.ViewHolder
         return mDataset.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder{
+    public class ViewHolder extends RecyclerView.ViewHolder {
 
-        ImageButton cancel;
-        EditText time;
-        Spinner day;
-        Spinner hours;
+        TextView dayInformation;
+        ImageButton dayRemove;
 
-        public ViewHolder(View v){
-
+        public ViewHolder(View v) {
             super(v);
-            cancel = v.findViewById(R.id.dayCancel);
-            hours = v.findViewById(R.id.hourSpinner);
-            day = v.findViewById(R.id.daySpinner);
-            time = v.findViewById(R.id.dayTime);
-
+            dayInformation = v.findViewById(R.id.dayInfo);
+            dayRemove = v.findViewById(R.id.dayRemove);
         }
 
     }
-
-
-
 
 
 }

@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,18 +42,16 @@ public class Schedule extends Fragment {
     private String FIRST_NAME = "firstName";
     private String LAST_NAME = "lastName";
     private String HOURS = "hours";
-
+    ScheduleAdapter scheduleAdapter;
 
     public Schedule() {
         // Required empty public constructor
     }
 
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         firestore = FirebaseFirestore.getInstance();
-
     }
 
     public void getData() {
@@ -70,7 +69,6 @@ public class Schedule extends Fragment {
         dateTomorrow.set(Calendar.MILLISECOND, 0);
         dateTomorrow.add(Calendar.DAY_OF_MONTH, 1);
 
-
         Date today = dateToday.getTime();
         Date tomorrow = dateTomorrow.getTime();
 
@@ -80,41 +78,19 @@ public class Schedule extends Fragment {
         Query query = firestore.collection(SCHEDULE).whereGreaterThan(DATE, timestampToday)
                 .whereLessThan(DATE, timestampTomorrow).orderBy(DATE, Query.Direction.ASCENDING);
 
-        query.get(Source.SERVER).addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+        query.get(Source.SERVER)
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
 
-                if (task.isSuccessful()) {
-
-                    for (DocumentSnapshot doc : task.getResult()) {
-
-                        HashMap<String, Object> map = new HashMap<>();
-
-                        map.put(FIRST_NAME, doc.get(FIRST_NAME));
-                        map.put(LAST_NAME, doc.get(LAST_NAME));
-                        map.put(HOURS, doc.get(HOURS));
-                        Timestamp timestamp = doc.getTimestamp(DATE);
-                        map.put(DATE, timestamp);
-
-                        scheduleItems.add(map);
-
+                        if (task.isSuccessful()) {
+                            for (DocumentSnapshot doc : task.getResult()) {
+                                scheduleItems.add((HashMap<String, Object>) doc.getData());
+                            }
+                            scheduleAdapter.notifyDataSetChanged();
+                        }
                     }
-
-                    setRecyclerView();
-
-                }
-            }
-        });
-
-
-    }
-
-    public void setRecyclerView() {
-
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        ScheduleAdapter sa = new ScheduleAdapter(getContext(), scheduleItems);
-        recyclerView.setAdapter(sa);
-
+                });
     }
 
     @Override
@@ -122,9 +98,11 @@ public class Schedule extends Fragment {
                              Bundle savedInstanceState) {
         final View RootView = inflater.inflate(R.layout.fragment_schedule, container, false);
         recyclerView = RootView.findViewById(R.id.scheduleRecyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        scheduleAdapter = new ScheduleAdapter(getContext(), scheduleItems);
+        recyclerView.setAdapter(scheduleAdapter);
         getData();
         return RootView;
     }
-
 
 }
